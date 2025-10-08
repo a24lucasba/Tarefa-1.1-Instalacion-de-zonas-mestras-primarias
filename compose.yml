@@ -1,12 +1,14 @@
 services:
   dnsserver:
     build: dnsserver
-    hostname: dnsserver
+    hostname: darthvader
     networks:
       rededns:
-          ipv4_address: 192.168.20.11
+          ipv4_address: 192.168.20.10
     volumes:
       - ./dnsserver/conf/named.conf.options:/etc/bind/named.conf.options
+      - ./dnsserver/conf/named.conf.local:/etc/bind/named.conf.local
+      - ./dnsserver/conf/db.starwars.lan:/etc/bind/db.starwars.lan
   eq1:
     build: debian
     hostname: eq1
