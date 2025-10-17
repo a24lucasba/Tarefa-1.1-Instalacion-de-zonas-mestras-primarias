@@ -2,15 +2,15 @@
 ; BIND data file for local loopback interface
 ;
 $TTL	604800
-@	IN	SOA	darthvader.starwars.lan. admin.starwars.lan. (
+@	IN	SOA	darthsidious.starwars.lan. admin.starwars.lan. (
 			      1		; Serial
 			 604800		; Refresh
 			  86400		; Retry
 			2419200		; Expire
 			 604800 )	; Negative Cache TTL
 ;
-@	IN	NS	darthvader.starwars.lan.
 @	IN	NS	darthsidious.starwars.lan.
+@	IN	A	192.168.20.100
 
 darthvader	IN	A	192.168.20.10
 skywalker   IN  A   192.168.20.101
@@ -26,4 +26,3 @@ palpatine   IN  CNAME   darthsidious
 @   IN  MX 10   c3p0
 
 lenda   IN  TXT "Que a forza te acompanhe"
-

@@ -80,4 +80,164 @@ mecd.gob.es.		1792	IN	SOA	ns1.age.gob.es. dns.cloudflare.com. 2384331704 10000 2
 
 ---
 
-## 3 Instalar unha zona primaria de resolución directa
+## 3 Instalar unha zona primaria de resolución directa, arquivos named.conf.local e do arquivo de zona db.starwars.lan
+
+### named.conf.local
+```
+zone "starwars.lan" IN {
+    type master;
+    file "/etc/bind/db.starwars.lan
+}
+```
+### db.starwars.lan
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL	604800
+@	IN	SOA	darthsidious.starwars.lan. admin.starwars.lan. (
+			      1		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+
+@	IN	NS	darthsidious.starwars.lan.
+
+darthvader	IN	A	192.168.20.10
+skywalker   IN  A   192.168.20.101
+skywalker   IN  A   192.168.20.111
+luke    IN  A   192.168.20.22
+darthsidious    IN  A   192.168.20.11
+yoda    IN  A   192.168.20.24
+yoda    IN  A   192.168.20.25
+c3p0    IN  A   192.168.20.26
+
+palpatine   IN  CNAME   darthsidious
+
+@   IN  MX 10   c3p0
+
+lenda   IN  TXT "Que a forza te acompanhe"
+
+```
+---
+
+## 4 Instalar la resolucion inversa, aruivos named.conf.local e db.20.168.192
+
+### named.conf.local
+```
+zone "starwars.lan" IN {
+    type master;
+    file "/etc/bind/db.starwars.lan
+}
+zone "20.168.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/db.20.168.192";
+};
+```
+### db.20.168.192
+```
+$TTL    604800
+@       IN      SOA     darthsidious.starwars.lan. admin.starwars.lan. (
+                        1               ; Serial
+                        604800          ; Refresh
+                        86400           ; Retry
+                        2419200         ; Expire
+                        604800 )        ; Negative Cache TTL
+;
+@        IN      NS      darthsidious.starwars.lan.
+
+10      IN      PTR     darthvader.starwars.lan.
+101     IN      PTR     skywalker.starwars.lan.
+111     IN      PTR     skywalker.starwars.lan.
+22      IN      PTR     luke.starwars.lan.
+11      IN      PTR     darthsidious.starwars.lan.
+24      IN      PTR     yoda.starwars.lan.
+25      IN      PTR     yoda.starwars.lan.
+26      IN      PTR     c3p0.starwars.lan.
+```
+---
+
+## 5 Comprobación de funcionamento
+
+
+### nslookup darthvader.starwars.lan localhost
+```
+root@dnsserver:/# nslookup darthvader.starwars.lan localhost
+Server:		localhost
+Address:	127.0.0.1#53
+
+Name:	darthvader.starwars.lan
+Address: 192.168.20.10
+```
+### nslookup skywalker.starwars.lan localhost
+```
+root@dnsserver:/# nslookup darthvader.starwars.lan localhost
+Server:		localhost
+Address:	127.0.0.1#53
+
+Name:	darthvader.starwars.lan
+Address: 192.168.20.10
+
+```
+### nslookup starwars.lan localhost
+```
+root@dnsserver:/# nslookup starwars.lan localhost
+Server:		localhost
+Address:	127.0.0.1#53
+
+Name:	starwars.lan
+Address: 192.168.20.100
+
+```
+### nslookup -q=mx starwars.lan localhost
+```
+root@dnsserver:/# nslookup -q=mx starwars.lan localhost
+Server:		localhost
+Address:	127.0.0.1#53
+
+starwars.lan	mail exchanger = 10 c3p0.starwars.lan.
+```
+### nslookup -q=ns starwars.lan localhost
+```
+root@dnsserver:/# nslookup -q=ns starwars.lan localhost
+Server:		localhost
+Address:	127.0.0.1#53
+
+starwars.lan	nameserver = darthsidious.starwars.lan.
+
+```
+### nslookup -q=soa starwars.lan localhost
+```
+root@dnsserver:/# nslookup -q=soa starwars.lan localhost
+Server:		localhost
+Address:	127.0.0.1#53
+
+starwars.lan
+	origin = darthsidious.starwars.lan
+	mail addr = admin.starwars.lan
+	serial = 1
+	refresh = 604800
+	retry = 86400
+	expire = 2419200
+	minimum = 604800
+
+```
+### nslookup -q=txt lenda.starwars.lan localhost
+```
+root@dnsserver:/# nslookup -q=txt lenda.starwars.lan localhost
+Server:		localhost
+Address:	127.0.0.1#53
+
+lenda.starwars.lan	text = "Que a forza te acompanhe"
+
+```
+### nslookup 192.168.20.11 localhost
+```
+root@dnsserver:/# nslookup 192.168.20.11 localhost
+11.20.168.192.in-addr.arpa	name = darthsidious.starwars.lan.
+
+```
+---
+
